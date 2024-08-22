@@ -14,8 +14,6 @@ describe(endpointUrl, () => {
     expect(response.body[0].done).toBeDefined();
     expect(typeof response.body[0].title).toBe("string");
     expect(typeof response.body[0].done).toBe("boolean");
-    console.log("Number of docs: " + response.body.length);
-    console.log(response.body);
   });
   it(
     "POST " + endpointUrl,
