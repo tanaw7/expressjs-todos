@@ -4,6 +4,8 @@ const newTodo = require("../mock-data/new-todo.json");
 
 const endpointUrl = "/todos/";
 
+let firstTodo;
+
 describe(endpointUrl, () => {
   test("GET " + endpointUrl, async () => {
     const response = await request(app).get(endpointUrl);
@@ -14,6 +16,14 @@ describe(endpointUrl, () => {
     expect(response.body[0].done).toBeDefined();
     expect(typeof response.body[0].title).toBe("string");
     expect(typeof response.body[0].done).toBe("boolean");
+    firstTodo = response.body[0];
+  });
+  test("GET by Id: " + endpointUrl + ":todoId", async () => {
+    const response = await request(app).get(endpointUrl + firstTodo._id);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.title).toBe(firstTodo.title);
+    expect(response.body.done).toBe(firstTodo.done);
+  });
   });
   it(
     "POST " + endpointUrl,
