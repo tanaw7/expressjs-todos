@@ -9,6 +9,9 @@ TodoModel.create = jest.fn();
 TodoModel.find = jest.fn();
 TodoModel.findById = jest.fn();
 TodoModel.findByIdAndUpdate = jest.fn();
+TodoModel.findByIdAndDelete = jest.fn();
+
+// For above, we can use jest.mock("../../model.todo.model");
 
 let req, res, next;
 const todoId = "66c2e2697fe9cf71dc811a2e";
@@ -17,6 +20,43 @@ beforeEach(() => {
   res = httpMocks.createResponse();
   next = jest.fn();
 });
+
+describe("TodoController.deleteTodo", () => {
+  it("should have the deleteTodo function", () => {
+    expect(typeof TodoController.deleteTodo).toBe("function");
+  });
+
+  it("should call the deleteTodo function", async () => {
+    req.params.todoId = todoId;
+    await TodoController.deleteTodo(req, res, next);
+    expect(TodoModel.findByIdAndDelete).toHaveBeenCalledWith(todoId);
+  });
+
+  it("should get a response statusCode of 200 with a return of the deletedTodo json", async () => {
+    req.params.todoId = todoId;
+    TodoModel.findByIdAndDelete.mockReturnValue(newTodo);
+    await TodoController.deleteTodo(req, res, next);
+    expect(res._isEndCalled()).toBeTruthy;
+    expect(res.statusCode).toBe(200);
+    expect(res._getJSONData()).toStrictEqual(newTodo);
+  });
+
+  it("should handle errors", async () => {
+    const errorMessage = { message: "Cannot delete the document." };
+    const rejectedPromise = Promise.reject(errorMessage);
+    TodoModel.findByIdAndDelete.mockReturnValue(rejectedPromise);
+    await TodoController.deleteTodo(req, res, next);
+    expect(next).toHaveBeenCalledWith(errorMessage);
+  });
+
+  it("should handle 404 error", async () => {
+    TodoModel.findByIdAndDelete.mockReturnValue(null);
+    await TodoController.deleteTodo(req, res, next);
+    expect(res.statusCode).toBe(404);
+    expect(res._isEndCalled()).toBeTruthy();
+  });
+});
+
 describe("TodoController.updateTodo", () => {
   it("should have a updateTodo function", () => {
     expect(typeof TodoController.updateTodo).toBe("function");
