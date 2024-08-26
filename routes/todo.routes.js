@@ -5,5 +5,6 @@ const router = express.Router();
 router.post("/", todoController.createTodo);
 router.get("/", todoController.getTodos);
 router.get("/:todoId", todoController.getTodoById); // in controller it is req.params.todoId
+router.put("/:todoId", todoController.updateTodo);
 
 module.exports = router;
